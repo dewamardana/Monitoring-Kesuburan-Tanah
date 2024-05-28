@@ -1,21 +1,13 @@
 from flask import Flask, request, jsonify, render_template
-from flask_mysqldb import MySQL
+from supabase import create_client, Client
 import json
 
 app = Flask(__name__)
 
-# Konfigurasi MySQL
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'pkb'
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_PORT'] = 3306  # Sesuaikan dengan port MySQL Anda
-
-mysql = MySQL(app)
-
-# @app.route("/")
-# def hello():
-#     return "Hello, World!"
+# Konfigurasi Supabase
+supabase_url = 'https://jchndtdkbmzgppgxpfio.supabase.co'
+supabase_key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpjaG5kdGRrYm16Z3BwZ3hwZmlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTY4NzQ3MDQsImV4cCI6MjAzMjQ1MDcwNH0.WsZKLhMuQNy6ghqX_-kJdAmMobzAmb1wDO4POjNsFOI'
+supabase: Client = create_client(supabase_url, supabase_key)
 
 @app.route("/api/tambah", methods=['POST'])
 def api_tambah():
@@ -28,11 +20,18 @@ def api_tambah():
         lembab = data.get('lembab')
 
         if id_micro and ph and suhu and lembab:
-            cursor = mysql.connection.cursor()
-            sql = "INSERT INTO data (id_micro, ph, suhu, lembab) VALUES (%s, %s, %s, %s)"
-            cursor.execute(sql, (id_micro, ph, suhu, lembab))
-            mysql.connection.commit()
-            cursor.close()
+            response = supabase.table('data').insert({
+                'id_micro': id_micro,
+                'ph': ph,
+                'suhu': suhu,
+                'lembab': lembab
+            }).execute()
+
+            print("Response from Supabase:", response)  # Debugging response
+
+            if hasattr(response, 'error') and response.error:
+                return jsonify({'status': 'error', 'message': response.error['message']}), 500
+
             return jsonify({'status': 'success'}), 200
         else:
             return jsonify({'status': 'error', 'message': 'Data tidak lengkap'}), 400
@@ -42,19 +41,28 @@ def api_tambah():
 
 @app.route("/data", methods=['GET'])
 def get_data():
-    cursor = mysql.connection.cursor()
-    cursor.execute("SELECT id_micro, ph, suhu, lembab FROM data")
-    rows = cursor.fetchall()
-    cursor.close()
+    try:
+        response = supabase.table('data').select('id_micro, ph, suhu, lembab').execute()
+        print("Response from Supabase:", response)  # Debugging response
 
-    data = {
-        "id_micro": [row[0] for row in rows],
-        "ph": [row[1] for row in rows],
-        "suhu": [row[2] for row in rows],
-        "lembab": [row[3] for row in rows]
-    }
+        if hasattr(response, 'error') and response.error:
+            return jsonify({'status': 'error', 'message': response.error['message']}), 500
 
-    return jsonify(data)
+        rows = response.data
+        print("Rows:", rows)  # Debugging rows
+
+        data = {
+            "id_micro": [row['id_micro'] for row in rows],
+            "ph": [row['ph'] for row in rows],
+            "suhu": [row['suhu'] for row in rows],
+            "lembab": [row['lembab'] for row in rows]
+        }
+
+        print("Data:", data)  # Debugging data
+
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @app.route("/1")
 def chart1():
@@ -64,8 +72,18 @@ def chart1():
 def chart2():
     return render_template('chart2.html')
 
-# if __name__ == "__main__":
-#     app.run(host='0.0.0.0', port=5000)
+@app.route("/test-connection", methods=['GET'])
+def test_connection():
+    try:
+        response = supabase.table('data').select('id_micro').limit(1).execute()
+        print("Response from Supabase:", response)  # Debugging response
+
+        if hasattr(response, 'error') and response.error:
+            return jsonify({'status': 'error', 'message': response.error['message']}), 500
+        
+        return jsonify({'status': 'success', 'message': 'Connection successful', 'data': response.data}), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 if __name__ == "__main__":
-     app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)
