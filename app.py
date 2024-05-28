@@ -9,36 +9,6 @@ supabase_url = 'https://jchndtdkbmzgppgxpfio.supabase.co'
 supabase_key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpjaG5kdGRrYm16Z3BwZ3hwZmlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTY4NzQ3MDQsImV4cCI6MjAzMjQ1MDcwNH0.WsZKLhMuQNy6ghqX_-kJdAmMobzAmb1wDO4POjNsFOI'
 supabase: Client = create_client(supabase_url, supabase_key)
 
-@app.route("/api/tambah", methods=['POST'])
-def api_tambah():
-    try:
-        # Dapatkan data dari request
-        data = request.get_json()
-        id_micro = data.get('id')
-        ph = data.get('ph')
-        suhu = data.get('suhu')
-        lembab = data.get('lembab')
-
-        if id_micro and ph and suhu and lembab:
-            response = supabase.table('data').insert({
-                'id_micro': id_micro,
-                'ph': ph,
-                'suhu': suhu,
-                'lembab': lembab
-            }).execute()
-
-            print("Response from Supabase:", response)  # Debugging response
-
-            if hasattr(response, 'error') and response.error:
-                return jsonify({'status': 'error', 'message': response.error['message']}), 500
-
-            return jsonify({'status': 'success'}), 200
-        else:
-            return jsonify({'status': 'error', 'message': 'Data tidak lengkap'}), 400
-
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
 @app.route("/data", methods=['GET'])
 def get_data():
     try:
