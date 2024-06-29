@@ -1,0 +1,127 @@
+* {
+    margin: 0;
+    padding: 0;
+  }
+  /* AWAL INDEX HTML */
+  /* Bagian yang Kiri */
+  .left {
+    background-color: #00215E;
+    padding: 10px;
+  }
+  
+  .left .header-img,
+  .left .header-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh; /* Kurangi tinggi elemen flex */
+  }
+  
+  .left h1 {
+    font-size: 50px;
+    color: #03AED2;
+    margin-left: -100px;
+    margin: 0; /* Hapus margin default */
+  }
+  
+  .left p {
+    margin-top: -50px; /* Sesuaikan margin untuk penempatan teks */
+    color: #fff;
+  }
+  
+  
+  /* Bagian yang Kanan */
+  
+  .right {
+    background-color: #2C4E80;
+  }
+  .right h5{
+    font-size: 15px;
+  }
+  .right .no-acc h5{
+    color:#686D76;
+  }
+  .right .no-acc h5 span{
+    color:#00215E;
+  }
+  .right .forgot{
+    color:#A91D3A;
+    font-size: 10px;
+    text:bold;
+  }
+  /* AKHIR INDEX HTML */
+
+  /* AWAL CHART 1 */
+  .navigasi{
+    
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 20%; /* Adjust the width as necessary */
+    color: #fff;
+    background-color: #1A1741;
+    overflow: auto; /* Add this if the content might overflow */ 
+  }
+  .navigasi h1{
+    color:#55BED2;
+    margin-top: 20px;
+    margin-left:15px;
+  }
+  .navigasi p{
+    font-size: 12px;
+    margin-top:-15px;
+    margin-left:15px;
+  }
+  .navigasi h2{
+    color:#55BED2;
+    font-size:16px;
+    margin-left:15px;
+    
+  }
+  .navigasi h4{
+    font-size:12px;
+    margin-left:25px;
+  }
+  h4:hover{
+    color: #55BED2;
+  }
+  .navigasi ul{
+    list-style-type:none;
+    font-weight: bold;
+    font-size:12px;
+  }
+  li:hover{
+    color: #55BED2;
+  }
+  .side-bar{
+    margin-left:315px;
+    background-color: #29264E;
+    width:100%;
+    color:#fff;
+  }
+  .nav-top{
+    padding: 30px;
+  }
+  .nav-top h2{
+    font-size: 24px;
+  }
+  .nav-top p{
+    font-size: 15px;
+    margin-top: -5px;
+  }
+  .nav-top img{
+    border-radius: 50px;
+  }
+  .nav-top h3{
+    font-size: 18px;
+    margin-top:8px;
+    margin-left:-10px;
+  }
+  .nav-top .profile{
+    text-align: right;
+  }
+  .nav-top .profile img{
+    text-align: right;
+  }
+  /* AKHIR CHART 1 */

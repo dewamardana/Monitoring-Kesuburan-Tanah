@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Data Chart</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <link rel="stylesheet" href="fontawesome-free-6.5.1-web/css/all.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="wrapp">
+        <div class="row">
+            <div class="col-3 navigasi">
+                <div class="logo">
+                    <div class="row">
+                        <div class="col-3">
+                            <img src="image/LOGO PKB.png" alt=""  width="100">
+                        </div>
+                        <div class="col-9">
+                            <h1>SVM-IOT</h1>
+                        </div>   
+                    </div>
+                    <p>Automatic Watering System,<br> Using AI Technology.</p>
+                </div>
+                <h2 class="mb-3">GENERAL</h2>
+                <h4 class="mb-3"><i class="fa-solid fa-bars"></i> Dashboard</h4>
+                <h2 class="mb-3">SUPPORT</h2>
+                <h4><i class="fa-solid fa-gear"></i> Settings</h4>
+                <h4 class="mb-3"><i class="fa-solid fa-right-from-bracket"></i> Logout</h4>
+                <h2>CHART</h2>
+                <ul>
+                    <li><link rel="stylesheet" href="chart.html">Chart</li>
+                    <li>Chart sensor PH</li>
+                    <li>Chart sensor Suhu</li>
+                    <li>Chart sensor Lembab</li>
+                </ul>
+            </div>
+
+            <div class="col-9 side-bar">
+                <div class="nav-top">
+                    <div class="row">
+                        <div class="col-6">
+                            <h2>Welcome Back, Dayuani</h2>
+                            <p>Here are your plants updates.</p>
+                        </div>
+                        <div class="col-6 profile">
+                            <div class="row">
+                                <div class="col-10"><img src="image/contoh.jpeg" alt="" width="45"></div>
+                                <div class="col-2"><h3>Dayuani</h3></div>
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                <div style="margin-left: 200px">
+                    <h2>Data Chart - Gabungan</h2>
+                    <canvas id="combinedChart" width="600" height="600"></canvas>
+                    
+                </div>    
+            </div>
+        </div>
+    </div>
+</div>
+    
+    <script>
+        let combinedChart, phChart, suhuChart, lembabChart;
+
+        async function fetchData() {
+            const response = await fetch('/data');
+            const data = await response.json();
+            return data;
+        }
+
+        function createCombinedChart(ctx, data) {
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.id_micro,
+                    datasets: [
+                        {
+                            label: 'pH',
+                            data: data.ph,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            fill: false,
+                        },
+                        {
+                            label: 'Suhu',
+                            data: data.suhu,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            fill: false,
+                        },
+                        {
+                            label: 'Lembab',
+                            data: data.lembab,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            fill: false,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: false,
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'ID Micro',
+                            },
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Value',
+                            },
+                        },
+                    },
+                },
+            });
+        }
+
+        function createIndividualChart(ctx, labels, data, label, color) {
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: label,
+                            data: data,
+                            borderColor: color,
+                            fill: false,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: false,
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'ID Micro',
+                            },
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Value',
+                            },
+                        },
+                    },
+                },
+            });
+        }
+
+        async function updateChart() {
+            const data = await fetchData();
+            const combinedCtx = document.getElementById('combinedChart').getContext('2d');
+            const phCtx = document.getElementById('phChart').getContext('2d');
+            const suhuCtx = document.getElementById('suhuChart').getContext('2d');
+            const lembabCtx = document.getElementById('lembabChart').getContext('2d');
+
+            // Filter data for id_micro 2
+            const filteredData = {
+                id_micro: [],
+                ph: [],
+                suhu: [],
+                lembab: [],
+            };
+            for (let i = 0; i < data.id_micro.length; i++) {
+                if (data.id_micro[i] === 1) {
+                    filteredData.id_micro.push(data.id_micro[i]);
+                    filteredData.ph.push(data.ph[i]);
+                    filteredData.suhu.push(data.suhu[i]);
+                    filteredData.lembab.push(data.lembab[i]);
+                }
+            }
+
+            // Destroy old charts if they exist
+            if (combinedChart) combinedChart.destroy();
+            if (phChart) phChart.destroy();
+            if (suhuChart) suhuChart.destroy();
+            if (lembabChart) lembabChart.destroy();
+
+            // Create new charts
+            combinedChart = createCombinedChart(combinedCtx, filteredData);
+            phChart = createIndividualChart(
+                phCtx,
+                filteredData.id_micro,
+                filteredData.ph,
+                'pH dengan ID Micro 1',
+                'rgba(75, 192, 192, 1)'
+            );
+            suhuChart = createIndividualChart(
+                suhuCtx,
+                filteredData.id_micro,
+                filteredData.suhu,
+                'Suhu dengan ID Micro 1',
+                'rgba(255, 99, 132, 1)'
+            );
+            lembabChart = createIndividualChart(
+                lembabCtx,
+                filteredData.id_micro,
+                filteredData.lembab,
+                'Lembab dengan ID Micro 1',
+                'rgba(54, 162, 235, 1)'
+            );
+        }
+
+        updateChart();
+        setInterval(updateChart, 20000); // Update every 5 seconds
+    </script>
+</body>
+
+</html>
