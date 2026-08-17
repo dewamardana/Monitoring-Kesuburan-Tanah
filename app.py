@@ -19,8 +19,8 @@ loaded_scaler = pickle.load(open('scaler.sav', 'rb'))
 ESP32_URL = 'http://192.168.84.159'
 
 # Supabase configuration
-supabase_url = 'https://jchndtdkbmzgppgxpfio.supabase.co'
-supabase_key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpjaG5kdGRrYm16Z3BwZ3hwZmlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTY4NzQ3MDQsImV4cCI6MjAzMjQ1MDcwNH0.WsZKLhMuQNy6ghqX_-kJdAmMobzAmb1wDO4POjNsFOI'
+supabase_url = ''
+supabase_key = ''
 supabase: Client = create_client(supabase_url, supabase_key)
 
 @app.route("/", methods=['GET'])
